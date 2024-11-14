@@ -1,2 +1,2 @@
 # IsoSpectra
-An intuitive and beautiful app to plot and analyse NMR spectra.
+An intuitive and beautiful app that uses Streamlit to plot and analyse NMR spectra.
