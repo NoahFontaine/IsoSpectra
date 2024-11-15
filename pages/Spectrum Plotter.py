@@ -17,8 +17,19 @@ st.markdown("""
         .normal_text {
             font-size: 30x;
             color: #333333;
-        }      
-
+        }
+        
+        .normal_text_two {
+            font-size: 30x;
+            color: #333333;
+            padding-bottom: 15px;
+        }
+        
+        .normal_text_three {
+            font-size: 30x;
+            color: #333333;
+            padding-bottom: 40px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -38,32 +49,44 @@ with col2:
 if uploaded_file is not None:
 
     data = read_file(uploaded_file)
+
+    current_tab = st.segmented_control(label="Select your options", options=["Visualisation Magic", "Peak Wizard", "More analysis"], label_visibility="hidden", default=None)
     
-    # Placeholder for the plot
-    graph_placeholder = st.empty()
+    st.markdown("<br>" * 1, unsafe_allow_html=True)  # Adds line breaks
 
-    # Initialize session state variable for active tab
-    if 'active_tab' not in st.session_state:
-        st.session_state['active_tab'] = "Tab 1"  # Default tab
+    if current_tab == None:
+        st.plotly_chart(plot_graph(data=data), use_container_width=True)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Original Plot", "Visualisation editor", "Find peaks", "More analysis"])
+    if current_tab == "Visualisation Magic":
+        graph_placeholder = st.empty()
 
-    with tab1:
-        st.session_state['active_tab'] = "Tab 1" 
-        print(st.session_state['active_tab'])
-        graph_placeholder.plotly_chart(plot_graph(data=data), use_container_width=True)
+        col1, col2, col3 = st.columns(3)
 
-    with tab3:
-        st.session_state['active_tab'] = "Tab 3"
-        print(st.session_state['active_tab'])
+        # Toggle options, choose colors, ...
+        show_xgrid = col1.toggle("Show vertical gridlines", value=False)
+        main_color = col2.color_picker("Main NMR color (default #1f77b4)", value="#1f77b4")
+        peak_color = col3.color_picker("Peaks color (default #d62728)", value="#d62728")
 
-        st.markdown('<div class="normal_text">Find peaks by adjusting <strong>height</strong> and <strong>distance</strong> using the sliders bellow.. Note that <strong>height</strong> and <strong>distance</strong>.</div>', unsafe_allow_html=True)
+        # Graph with all the options
+        graph_placeholder.plotly_chart(plot_graph(data=data, main_color=main_color, show_xgrid=show_xgrid),
+                                                    use_container_width=True)
+
+    if current_tab == "Peak Wizard":
+
+        st.markdown('<div class="normal_text_two">Find peaks by adjusting the minimum <strong>height</strong> and/or <strong>prominence</strong> using the sliders below.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="normal_text">&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<strong>Height</strong>: gives you a minimum intensity value that your peak needs to be above.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="normal_text_two">&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<strong>Prominence</strong>: determines the minimum height necessary to descend to get from the peak to any higher terrain.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="normal_text_three"><strong>Scroll down</strong> and you will see the an updated plot with the peaks, and a table of all the relevant peak values (both δ and <i>I</i>). You can then choose whether or not you want to see the checmical shift of the peaks, and if you want vertical gridlines. Of course, you can modify the color of your traces.</div>', unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
 
         with col1:
-            height = st.slider("Minimum height of the peaks", min_value=1, max_value=find_second_heighest_peak(data)+1, value=None, step=1)
+            height = st.slider("Minimum height of the peaks", min_value=1, max_value=find_second_heighest_peak(data)+1, value=1, step=1)
+        with col2:
+            prominence = st.slider("How much do you want your peaks to stand out?", min_value=1, max_value=int(find_second_heighest_peak(data)/10), value=int(find_second_heighest_peak(data)/20), step=1)
         
+        col1, col2 = st.columns([2.2, 1])
+
         with col2:
             # Center the df and the titles
             st.markdown("""
@@ -82,8 +105,23 @@ if uploaded_file is not None:
                 """, unsafe_allow_html=True)
 
             # Table of peaks
-            peaks = find_peaks(data=data, height=height)
-            st.dataframe(peaks, width=500, hide_index=True)
-            # For Tab 3, use the plot with peaks
-            if st.session_state['modify_graph']:
-                graph_placeholder.plotly_chart(plot_graph_with_peaks(data=data, peaks=peaks), use_container_width=True)
+            peaks = find_peaks(data=data, height=height, prominence=prominence)
+            st.dataframe(peaks, width=400, hide_index=True)
+        
+        with col1:
+            graph_placeholder = st.empty()
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            # Toggle options, choose colors, ...
+            show_peaks = col1.toggle("Show peaks", value=True)
+            PPM_on = col1.toggle("Show PPM values of peaks", value=False)
+            show_xgrid = col4.toggle("Show vertical gridlines", value=False)
+            main_color = col2.color_picker("Main NMR color (default #1f77b4)", value="#1f77b4")
+            peak_color = col3.color_picker("Peaks color (default #d62728)", value="#d62728")
+
+        # Graph with all the options
+        graph_placeholder.plotly_chart(plot_graph_with_peaks(data=data, peaks=peaks, show_peak_labels=PPM_on,main_color=main_color,
+                                                            peak_color=peak_color, show_peaks=show_peaks, show_xgrid=show_xgrid),
+                                                            use_container_width=True)
+        
