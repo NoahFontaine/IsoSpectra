@@ -5,6 +5,9 @@ from scipy import signal
 def read_file(data_path: str) -> pd.DataFrame:
     return pd.read_csv(data_path)
 
+def find_nmr_domain(data: pd.DataFrame):
+    return [min(data.iloc[:, 0]), max(data.iloc[:, 0])]
+
 
 def plot_graph(data: pd.DataFrame, main_color="#1f77b4", show_xgrid=False):
 
@@ -62,4 +65,19 @@ def plot_graph_with_peaks(data: pd.DataFrame, peaks: pd.DataFrame, main_color="#
         fig.update_layout(xaxis=dict(showgrid=True, gridcolor='rgba(0, 0, 0, 0.1)', gridwidth=0.2))
 
 
+    return fig
+
+
+def plot_graph_with_prediction(data: pd.DataFrame, prediction: pd.DataFrame, scale: float, main_color="#1f77b4", prediction_color="#ff7f0e", show_predictions=True, show_xgrid=False):
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=data.iloc[:,0], y=data.iloc[:,1], name="NMR Trace", line=dict(color=main_color)))
+    if show_predictions == True:
+        fig.add_trace(go.Scatter(x=prediction.iloc[:,0], y=prediction.iloc[:,1]*scale, name="Prediction", line=dict(color=prediction_color, width=0.5)))
+
+    fig.update_layout(xaxis=dict(range=[data.iloc[-1,0], data.iloc[0,0]]), xaxis_title="Chemical shift δ to TMS (PPM)", yaxis_title="Relative Signal Intensity I (a.u.)", height=500)
+
+    if show_xgrid == True:   
+        fig.update_layout(xaxis=dict(showgrid=True, gridcolor='rgba(0, 0, 0, 0.1)', gridwidth=0.2))
+    
     return fig
