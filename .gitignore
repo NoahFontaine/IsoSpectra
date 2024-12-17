@@ -1,2 +1,8 @@
 venv/
 functions\__pycache__/
+CA step 1 product + pt2 crude nmr.csv
+df.csv
+*.png
+*.ipynb
+*.json
+1d_pipe.fid
