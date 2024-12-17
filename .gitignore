@@ -6,3 +6,4 @@ df.csv
 *.ipynb
 *.json
 1d_pipe.fid
+*.csv
