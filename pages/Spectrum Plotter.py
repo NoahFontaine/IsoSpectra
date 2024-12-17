@@ -1,7 +1,6 @@
 from functions.plotting import plot_graph, find_peaks, read_file, find_second_heighest_peak, plot_graph_with_peaks, find_nmr_domain, plot_graph_with_prediction
 from functions.molecule import iupac_to_smiles, post_hmdb_id, get_predicted_peaks, full_predicted_spectrum
 import streamlit as st
-from stqdm import stqdm
 
 st.set_page_config(layout="wide", page_title="1D Spectra Plotter", page_icon="🔬")
 
