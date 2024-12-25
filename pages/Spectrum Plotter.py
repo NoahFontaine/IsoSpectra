@@ -41,7 +41,7 @@ with col1:
     # Title
     st.markdown('<div class="title">1D NMR Spectra Plotter</div>', unsafe_allow_html=True)
     # Explanation
-    st.markdown('<div class="normal_text">Simply drag and drop your .csv file of your spectrum, and a Plotly plot will generate. On the top-right you can zoom in, out, choose your window, or even save it. </div>', unsafe_allow_html=True)
+    st.markdown('<div class="normal_text">Simply drag and drop your .csv file of your spectrum, and a Plotly plot will generate. On the top-right you can zoom in, out, choose your window, or even save it. You can automatically find relevant peaks or compare your NMR with experimental data by searching your molecule on the HMDB database.</div>', unsafe_allow_html=True)
 
 with col2:
     # File uploader widget
